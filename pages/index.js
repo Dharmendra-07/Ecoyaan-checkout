@@ -1,42 +1,38 @@
 import { useRouter } from 'next/router'
-import Image from 'next/image'
 import Layout from '../components/UI/Layout'
 import { useCheckout } from '../context/CheckoutContext'
 
 function CartItem({ item, onUpdateQty, onRemove }) {
   return (
-    <div className="product-card bg-white rounded-2xl p-4 sm:p-5 flex gap-4 border border-forest-100">
-      {/* Product Image */}
-      <div className="relative w-20 h-20 sm:w-24 sm:h-24 flex-shrink-0 rounded-xl overflow-hidden bg-forest-50">
-        <img
-          src={item.image}
-          alt={item.product_name}
-          className="w-full h-full object-cover"
-        />
+    <div
+      className="product-card rounded-2xl p-4 sm:p-5 flex gap-4 stagger-item"
+      style={{ borderRadius: '16px' }}
+    >
+      <div className="relative w-20 h-20 sm:w-24 sm:h-24 flex-shrink-0 rounded-xl overflow-hidden" style={{ background: 'var(--bg-muted)' }}>
+        <img src={item.image} alt={item.product_name} className="w-full h-full object-cover" />
         {item.badge && (
-          <span className="absolute top-1 left-1 bg-forest-600 text-white text-[10px] font-semibold px-1.5 py-0.5 rounded-full">
+          <span className="absolute top-1 left-1 text-white text-[10px] font-bold px-2 py-0.5 rounded-full shadow-sm"
+            style={{ background: 'var(--accent-dark)' }}>
             {item.badge}
           </span>
         )}
       </div>
-
-      {/* Product Info */}
       <div className="flex-1 min-w-0">
         <div className="flex items-start justify-between gap-2">
           <div>
-            <h3
-              className="text-forest-800 font-semibold text-sm sm:text-base leading-snug"
-              style={{ fontFamily: 'Lora, Georgia, serif' }}
-            >
+            <h3 className="font-semibold text-sm sm:text-base leading-snug" style={{ fontFamily: 'Lora, Georgia, serif', color: 'var(--text-primary)' }}>
               {item.product_name}
             </h3>
             {item.description && (
-              <p className="text-forest-400 text-xs mt-0.5">{item.description}</p>
+              <p className="text-xs mt-0.5 leading-relaxed" style={{ color: 'var(--text-faint)' }}>{item.description}</p>
             )}
           </div>
           <button
             onClick={() => onRemove(item.product_id)}
-            className="text-forest-300 hover:text-red-400 transition-colors flex-shrink-0 p-1"
+            className="eco-btn flex-shrink-0 p-1.5 rounded-lg transition-colors"
+            style={{ color: 'var(--text-faint)' }}
+            onMouseEnter={e => { e.currentTarget.style.color = '#ef4444'; e.currentTarget.style.background = 'rgba(239,68,68,0.08)' }}
+            onMouseLeave={e => { e.currentTarget.style.color = 'var(--text-faint)'; e.currentTarget.style.background = 'transparent' }}
             aria-label="Remove item"
           >
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -44,35 +40,23 @@ function CartItem({ item, onUpdateQty, onRemove }) {
             </svg>
           </button>
         </div>
-
         <div className="flex items-center justify-between mt-3">
-          {/* Quantity Controls */}
-          <div className="flex items-center gap-2 bg-forest-50 rounded-xl p-1">
+          <div className="flex items-center gap-1 p-1 rounded-xl border" style={{ background: 'var(--bg-muted)', borderColor: 'var(--border-soft)' }}>
             <button
               onClick={() => onUpdateQty(item.product_id, item.quantity - 1)}
-              className="w-7 h-7 rounded-lg bg-white border border-forest-200 flex items-center justify-center text-forest-600 hover:bg-forest-100 transition-colors shadow-sm"
-            >
-              −
-            </button>
-            <span className="w-6 text-center text-sm font-semibold text-forest-700">
-              {item.quantity}
-            </span>
+              className="eco-btn w-7 h-7 rounded-lg flex items-center justify-center font-bold text-base"
+              style={{ background: 'var(--bg-card)', border: '1px solid var(--border-soft)', color: 'var(--accent-green)' }}
+            >−</button>
+            <span className="w-7 text-center text-sm font-bold" style={{ color: 'var(--text-primary)' }}>{item.quantity}</span>
             <button
               onClick={() => onUpdateQty(item.product_id, item.quantity + 1)}
-              className="w-7 h-7 rounded-lg bg-white border border-forest-200 flex items-center justify-center text-forest-600 hover:bg-forest-100 transition-colors shadow-sm"
-            >
-              +
-            </button>
+              className="eco-btn w-7 h-7 rounded-lg flex items-center justify-center font-bold text-base"
+              style={{ background: 'var(--bg-card)', border: '1px solid var(--border-soft)', color: 'var(--accent-green)' }}
+            >+</button>
           </div>
-
-          {/* Price */}
           <div className="text-right">
-            <p className="text-forest-800 font-bold text-base">
-              ₹{(item.product_price * item.quantity).toLocaleString()}
-            </p>
-            <p className="text-forest-400 text-xs">
-              ₹{item.product_price} each
-            </p>
+            <p className="font-bold text-base" style={{ color: 'var(--text-primary)' }}>₹{(item.product_price * item.quantity).toLocaleString()}</p>
+            <p className="text-xs" style={{ color: 'var(--text-faint)' }}>₹{item.product_price.toLocaleString()} each</p>
           </div>
         </div>
       </div>
@@ -82,103 +66,84 @@ function CartItem({ item, onUpdateQty, onRemove }) {
 
 export default function CartPage() {
   const router = useRouter()
-  const { cartItems, shippingFee, discount, subtotal, grandTotal, updateQuantity, removeItem } =
-    useCheckout()
+  const { cartItems, shippingFee, discount, subtotal, grandTotal, updateQuantity, removeItem } = useCheckout()
 
   return (
     <Layout currentStep={1}>
       <div className="animate-fade-up">
         <div className="mb-6">
-          <h1
-            className="text-2xl sm:text-3xl font-bold text-forest-800"
-            style={{ fontFamily: 'Lora, Georgia, serif' }}
-          >
+          <h1 className="text-2xl sm:text-3xl font-bold" style={{ fontFamily: 'Lora, Georgia, serif', color: 'var(--text-primary)' }}>
             Your Cart
           </h1>
-          <p className="text-forest-500 text-sm mt-1">
+          <p className="text-sm mt-1" style={{ color: 'var(--text-muted)' }}>
             {cartItems.length} item{cartItems.length !== 1 ? 's' : ''} ready for checkout
           </p>
         </div>
 
         {cartItems.length === 0 ? (
-          <div className="text-center py-20">
-            <div className="text-6xl mb-4">🛒</div>
-            <h2 className="text-xl font-semibold text-forest-700 mb-2">Your cart is empty</h2>
-            <p className="text-forest-400 text-sm">Start shopping for eco-friendly products!</p>
+          <div className="text-center py-20 animate-scale-in">
+            <div className="w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-4 text-4xl"
+              style={{ background: 'var(--bg-muted)' }}>🛒</div>
+            <h2 className="text-xl font-semibold mb-2" style={{ fontFamily: 'Lora, Georgia, serif', color: 'var(--text-secondary)' }}>
+              Your cart is empty
+            </h2>
+            <p className="text-sm" style={{ color: 'var(--text-faint)' }}>Start shopping for eco-friendly products!</p>
           </div>
         ) : (
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             {/* Cart Items */}
             <div className="lg:col-span-2 space-y-3">
-              {/* Eco Badge */}
-              <div className="flex items-center gap-2 bg-forest-50 border border-forest-200 rounded-xl px-4 py-2.5">
-                <span className="text-sm">🌱</span>
-                <p className="text-xs text-forest-600 font-medium">
+              <div
+                className="flex items-center gap-2 rounded-xl px-4 py-3 border animate-slide-in"
+                style={{ background: 'linear-gradient(to right, var(--bg-muted), var(--bg-elevated))', borderColor: 'var(--border-soft)' }}
+              >
+                <span className="text-lg">🌱</span>
+                <p className="text-xs font-medium" style={{ color: 'var(--text-secondary)' }}>
                   Your purchase offsets{' '}
-                  <span className="font-bold">
+                  <span className="font-bold" style={{ color: 'var(--text-primary)' }}>
                     {(cartItems.length * 0.5).toFixed(1)} kg
                   </span>{' '}
                   of CO₂ emissions
                 </p>
               </div>
-
               {cartItems.map(item => (
-                <CartItem
-                  key={item.product_id}
-                  item={item}
-                  onUpdateQty={updateQuantity}
-                  onRemove={removeItem}
-                />
+                <CartItem key={item.product_id} item={item} onUpdateQty={updateQuantity} onRemove={removeItem} />
               ))}
             </div>
 
             {/* Order Summary */}
             <div className="lg:col-span-1">
-              <div className="bg-white rounded-2xl border border-forest-100 p-5 sticky top-28">
-                <h2
-                  className="text-lg font-bold text-forest-800 mb-4"
-                  style={{ fontFamily: 'Lora, Georgia, serif' }}
-                >
+              <div
+                className="rounded-2xl border p-5 sticky top-28 animate-slide-in"
+                style={{ background: 'var(--bg-card)', borderColor: 'var(--border-soft)', boxShadow: 'var(--shadow-sm)' }}
+              >
+                <h2 className="text-lg font-bold mb-4" style={{ fontFamily: 'Lora, Georgia, serif', color: 'var(--text-primary)' }}>
                   Order Summary
                 </h2>
-
                 <div className="space-y-3 text-sm">
-                  <div className="flex justify-between text-forest-600">
+                  <div className="flex justify-between" style={{ color: 'var(--text-secondary)' }}>
                     <span>Subtotal</span>
-                    <span className="font-medium">₹{subtotal.toLocaleString()}</span>
+                    <span className="font-semibold">₹{subtotal.toLocaleString()}</span>
                   </div>
-                  <div className="flex justify-between text-forest-600">
+                  <div className="flex justify-between" style={{ color: 'var(--text-secondary)' }}>
                     <span>Shipping</span>
-                    <span className="font-medium">₹{shippingFee}</span>
+                    <span className="font-semibold">₹{shippingFee}</span>
                   </div>
                   {discount > 0 && (
-                    <div className="flex justify-between text-forest-500">
+                    <div className="flex justify-between" style={{ color: 'var(--text-muted)' }}>
                       <span>Discount</span>
-                      <span className="font-medium text-forest-600">−₹{discount}</span>
+                      <span className="font-semibold" style={{ color: 'var(--accent-green)' }}>−₹{discount}</span>
                     </div>
                   )}
-
-                  <div className="border-t border-forest-100 pt-3 flex justify-between">
-                    <span className="font-bold text-forest-800 text-base">Grand Total</span>
-                    <span className="font-bold text-forest-800 text-base">
-                      ₹{grandTotal.toLocaleString()}
-                    </span>
+                  <div className="border-t pt-3 flex justify-between" style={{ borderColor: 'var(--border-soft)' }}>
+                    <span className="font-bold text-base" style={{ color: 'var(--text-primary)' }}>Grand Total</span>
+                    <span className="font-bold text-base" style={{ color: 'var(--text-primary)' }}>₹{grandTotal.toLocaleString()}</span>
                   </div>
                 </div>
-
-                {/* Shipping note */}
-                <p className="text-xs text-forest-400 mt-3 bg-earth-50 rounded-lg px-3 py-2">
+                <p className="text-xs mt-3 rounded-xl px-3 py-2.5 border" style={{ color: 'var(--text-muted)', background: 'var(--bg-muted)', borderColor: 'var(--border-soft)' }}>
                   📦 Standard delivery in 3–5 business days
                 </p>
-
-                <button
-                  onClick={() => router.push('/shipping')}
-                  className="eco-btn w-full mt-4 bg-forest-600 hover:bg-forest-700 text-white font-semibold py-3.5 rounded-xl transition-all duration-200 shadow-md hover:shadow-lg animate-pulse-green"
-                >
-                  Proceed to Checkout →
-                </button>
-
-                <div className="mt-3 flex items-center justify-center gap-3 text-xs text-forest-400">
+                <div className="mt-3 flex items-center justify-center gap-3 text-xs" style={{ color: 'var(--text-faint)' }}>
                   <span>🔒 SSL Secured</span>
                   <span>·</span>
                   <span>💚 Eco Certified</span>
@@ -188,30 +153,46 @@ export default function CartPage() {
           </div>
         )}
       </div>
+
+      {/* Sticky Bottom Action Bar */}
+      <div className="fixed bottom-0 left-0 right-0 z-40 sticky-bar border-t" style={{ borderColor: 'var(--border-soft)', boxShadow: '0 -4px 24px rgba(0,0,0,0.08)' }}>
+        <div className="max-w-5xl mx-auto px-4 py-3 flex items-center justify-between gap-3">
+          <div className="hidden sm:flex items-center gap-2 text-xs" style={{ color: 'var(--text-muted)' }}>
+            <span className="font-semibold text-sm" style={{ color: 'var(--text-primary)' }}>₹{grandTotal.toLocaleString()}</span>
+            <span>· {cartItems.length} item{cartItems.length !== 1 ? 's' : ''}</span>
+          </div>
+          <div className="flex gap-3 w-full sm:w-auto">
+            <button
+              onClick={() => window.history.back()}
+              className="eco-btn btn-ghost flex-1 sm:flex-none sm:px-6 font-semibold py-3 rounded-xl text-sm"
+            >
+              ← Back
+            </button>
+            <button
+              onClick={() => router.push('/shipping')}
+              disabled={cartItems.length === 0}
+              className="eco-btn btn-primary flex-1 sm:flex-none sm:px-8 font-bold py-3 rounded-xl text-sm"
+            >
+              Next: Shipping →
+            </button>
+          </div>
+        </div>
+      </div>
     </Layout>
   )
 }
 
-// SSR: Fetch cart data from mock API
 export async function getServerSideProps(context) {
   try {
     const protocol = process.env.NODE_ENV === 'production' ? 'https' : 'http'
     const host = context.req.headers.host
     const res = await fetch(`${protocol}://${host}/api/cart`)
     const cartData = await res.json()
-
-    return {
-      props: { cartData },
-    }
+    return { props: { cartData } }
   } catch (error) {
-    console.error('Failed to fetch cart data:', error)
     return {
       props: {
-        cartData: {
-          cartItems: [],
-          shipping_fee: 50,
-          discount_applied: 0,
-        },
+        cartData: { cartItems: [], shipping_fee: 50, discount_applied: 0 },
       },
     }
   }
